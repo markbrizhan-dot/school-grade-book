@@ -1,0 +1,394 @@
+/* static/css/style.css - Дополнительные стили для сайта */
+
+/* ==================== ОБЩИЕ СТИЛИ ==================== */
+
+/* Анимация для карточек */
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Стили для статусов */
+.badge-status {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+/* Стили для таблиц */
+.table-hover tbody tr:hover {
+    background-color: rgba(52, 152, 219, 0.05);
+    cursor: default;
+}
+
+/* ==================== СТИЛИ ДЛЯ СТРАНИЦЫ ВХОДА ==================== */
+
+/* Анимация для формы входа */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-card {
+    animation: fadeInUp 0.6s ease;
+}
+
+/* ==================== СТИЛИ ДЛЯ ДАШБОРДА ==================== */
+
+/* Статистические карточки с разными цветами */
+.stat-card-1 .icon { color: #3498db; }
+.stat-card-2 .icon { color: #2ecc71; }
+.stat-card-3 .icon { color: #f39c12; }
+.stat-card-4 .icon { color: #e74c3c; }
+
+.stat-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card .number {
+    transition: color 0.3s ease;
+}
+
+.stat-card:hover .number {
+    color: #3498db;
+}
+
+/* ==================== СТИЛИ ДЛЯ ТАБЛИЦ ==================== */
+
+/* Чередование строк в таблицах */
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Стили для оценок */
+.grade-5 {
+    color: #27ae60;
+    font-weight: bold;
+}
+
+.grade-4 {
+    color: #2ecc71;
+    font-weight: bold;
+}
+
+.grade-3 {
+    color: #f39c12;
+    font-weight: bold;
+}
+
+.grade-2 {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.grade-none {
+    color: #bdc3c7;
+}
+
+/* ==================== СТИЛИ ДЛЯ ПОСЕЩАЕМОСТИ ==================== */
+
+/* Стили статусов посещаемости */
+.status-present {
+    color: #27ae60;
+    font-weight: bold;
+}
+
+.status-absent {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.status-late {
+    color: #f39c12;
+    font-weight: bold;
+}
+
+/* ==================== СТИЛИ ДЛЯ ОТЧЕТОВ ==================== */
+
+/* Стили для печати отчетов */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    .report-container {
+        padding: 20px;
+        background: white;
+    }
+    
+    .report-container .card {
+        border: 1px solid #ddd !important;
+        box-shadow: none !important;
+    }
+    
+    .report-container .card-header {
+        background: #f8f9fa !important;
+        border-bottom: 2px solid #ddd !important;
+    }
+}
+
+/* ==================== СТИЛИ ДЛЯ ФОРМ ==================== */
+
+/* Стили для обязательных полей */
+.required-field::after {
+    content: " *";
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+/* Стили для полей с ошибками */
+.is-invalid {
+    border-color: #e74c3c !important;
+    box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25) !important;
+}
+
+.invalid-feedback {
+    display: block;
+    color: #e74c3c;
+    font-size: 0.875rem;
+}
+
+/* ==================== СТИЛИ ДЛЯ НАВИГАЦИИ ==================== */
+
+/* Активный пункт меню */
+.sidebar .nav-link.active {
+    background: #3498db;
+    color: white !important;
+    border-left: 4px solid #2ecc71;
+}
+
+.sidebar .nav-link {
+    border-left: 4px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.sidebar .nav-link:hover {
+    border-left-color: #3498db;
+    padding-left: 24px;
+}
+
+/* ==================== СТИЛИ ДЛЯ FLASH СООБЩЕНИЙ ==================== */
+
+.flash-messages .alert {
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: none;
+}
+
+.flash-messages .alert-success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.flash-messages .alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.flash-messages .alert-warning {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.flash-messages .alert-info {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+/* ==================== АДАПТИВНЫЕ СТИЛИ ==================== */
+
+/* Планшеты */
+@media (max-width: 992px) {
+    .main-content {
+        margin-left: 0;
+        padding: 15px;
+    }
+    
+    .stat-card .number {
+        font-size: 24px;
+    }
+    
+    .sidebar {
+        width: 200px;
+    }
+}
+
+/* Мобильные устройства */
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+    
+    .main-content {
+        padding: 10px;
+    }
+    
+    .stat-card {
+        margin-bottom: 15px;
+        padding: 15px;
+    }
+    
+    .stat-card .number {
+        font-size: 20px;
+    }
+    
+    .stat-card .icon {
+        font-size: 24px;
+    }
+    
+    .table-responsive {
+        font-size: 14px;
+    }
+    
+    .btn-sm {
+        padding: 2px 6px;
+        font-size: 12px;
+    }
+    
+    .card-header {
+        font-size: 14px;
+        padding: 10px 15px;
+    }
+    
+    .flash-messages {
+        max-width: 90%;
+        right: 5%;
+        top: 60px;
+    }
+}
+
+/* Очень маленькие экраны */
+@media (max-width: 480px) {
+    .stat-card .number {
+        font-size: 18px;
+    }
+    
+    .stat-card .label {
+        font-size: 12px;
+    }
+    
+    .table-responsive {
+        font-size: 12px;
+    }
+    
+    .form-control, .form-select {
+        font-size: 14px;
+    }
+    
+    .navbar-brand {
+        font-size: 16px;
+    }
+}
+
+/* ==================== СТИЛИ ДЛЯ SCROLLBAR ==================== */
+
+/* Стилизация скроллбара для боковой панели */
+.sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: #2c3e50;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #3498db;
+    border-radius: 4px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: #2980b9;
+}
+
+/* ==================== ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ==================== */
+
+/* Текст-подсказка */
+.help-text {
+    font-size: 0.875rem;
+    color: #7f8c8d;
+    margin-top: 4px;
+}
+
+/* Разделитель */
+.divider {
+    border-top: 1px solid #ecf0f1;
+    margin: 20px 0;
+}
+
+/* Центрирование */
+.text-center-vertical {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Стиль для пустых состояний */
+.empty-state {
+    padding: 40px 20px;
+    text-align: center;
+    color: #bdc3c7;
+}
+
+.empty-state i {
+    font-size: 48px;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.empty-state h5 {
+    color: #2c3e50;
+}
+
+/* Стиль для загрузки */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #ecf0f1;
+    border-top-color: #3498db;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Стиль для отметок "Сохранено" */
+.saved-badge {
+    background: #27ae60;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    margin-left: 5px;
+}
