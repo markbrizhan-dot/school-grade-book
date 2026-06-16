@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Результат отчёта{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-file-pdf text-danger"></i> Отчёт по классу</h2>
+    <div>
+        <button onclick="window.print()" class="btn btn-secondary">
+            <i class="bi bi-printer"></i> Печать
+        </button>
+        <a href="{{ url_for('reports') }}" class="btn btn-primary">
+            <i class="bi bi-arrow-left"></i> Назад
+        </a>
+    </div>
+</div>
+
+<div class="card" id="report-content">
+    <div class="card-header text-center">
+        <h4>МАОУ ООШ №25 имени героев Советского Союза братьев Игнатовых</h4>
+        <h5>Отчёт по успеваемости</h5>
+        <p class="mb-0">Класс: <strong>{{ report.class_name }}</strong> | Четверть: {{ report.quarter }}</p>
+        <small class="text-muted">Дата формирования: {{ report.generated_at }}</small>
+    </div>
+    <div class="card-body">
+        <!-- Сводная информация -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="number">{{ report.students|length }}</div>
+                    <div class="label">Всего учащихся</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="number">
+                        {% set avg = report.students|map(attribute='average_grade')|select('is not none')|map('float')|sum / 
+                                   report.students|selectattr('average_grade', 'defined')|selectattr('average_grade', '!=', None)|list|length 
+                                   if report.students|selectattr('average_grade', 'defined')|selectattr('average_grade', '!=', None)|list|length > 0 else 0 %}
+                        {{ "%.1f"|format(avg) }}
+                    </div>
+                    <div class="label">Средний балл по классу</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="number">
+                        {% set excellent = report.students|selectattr('average_grade', '>', 4.5)|list|length %}
+                        {{ excellent }}
+                    </div>
+                    <div class="label">Отличников</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Таблица учащихся -->
+        <h6 class="mt-4">Успеваемость учащихся</h6>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>№</th>
+                        <th>ФИО учащегося</th>
+                        <th>Средний балл</th>
+                        <th>Кол-во оценок</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in report.students %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ student.last_name }} {{ student.first_name }}</td>
+                        <td>
+                            {% if student.average_grade %}
+                                <span class="fw-bold {% if student.average_grade >= 4.5 %}text-success{% elif student.average_grade >= 3.5 %}text-primary{% elif student.average_grade >= 2.5 %}text-warning{% else %}text-danger{% endif %}">
+                                    {{ "%.2f"|format(student.average_grade) }}
+                                </span>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ student.grades_count or 0 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer text-muted text-center small">
+        * Отчёт сформирован автоматически. Данные актуальны на момент формирования.
+    </div>
+</div>
+
+<style>
+    @media print {
+        .btn, .navbar, .sidebar, .flash-messages {
+            display: none !important;
+        }
+        .main-content {
+            margin-left: 0 !important;
+        }
+        .card {
+            border: none !important;
+            box-shadow: none !important;
+        }
+        .card-header {
+            background: white !important;
+        }
+        body {
+            background: white !important;
+        }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block title %}Успеваемость{% endblock %}
+
+{% block content %}
+<h2><i class="bi bi-book-fill text-success"></i> Успеваемость</h2>
+
+<!-- Фильтры -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3" id="filterForm">
+            <div class="col-md-3">
+                <label class="form-label">Класс</label>
+                <select name="class_id" class="form-select" onchange="document.getElementById('filterForm').submit()">
+                    <option value="">Выберите класс</option>
+                    {% for cls in classes %}
+                    <option value="{{ cls.id }}" {% if selected_class == cls.id|string %}selected{% endif %}>
+                        {{ cls.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Предмет</label>
+                <select name="subject_id" class="form-select" onchange="document.getElementById('filterForm').submit()">
+                    <option value="">Выберите предмет</option>
+                    {% for subj in subjects %}
+                    <option value="{{ subj.id }}" {% if selected_subject == subj.id|string %}selected{% endif %}>
+                        {{ subj.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Четверть</label>
+                <select name="quarter" class="form-select" onchange="document.getElementById('filterForm').submit()">
+                    <option value="">Выберите</option>
+                    {% for q in ['1', '2', '3', '4'] %}
+                    <option value="{{ q }}" {% if selected_quarter == q %}selected{% endif %}>Четверть {{ q }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search"></i> Показать
+                </button>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <a href="{{ url_for('grades') }}" class="btn btn-secondary w-100">Сбросить</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Таблица оценок -->
+{% if students_grades %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            <i class="bi bi-list-ul"></i> Оценки учащихся
+            <span class="badge bg-secondary ms-2">Четверть {{ selected_quarter }}</span>
+        </div>
+        <button type="button" class="btn btn-success btn-sm" onclick="submitAllGrades()">
+            <i class="bi bi-check2-all"></i> Готово
+        </button>
+    </div>
+    <div class="card-body p-0">
+        <form method="POST" action="{{ url_for('add_grade') }}" id="gradesForm">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Учащийся</th>
+                            <th>Оценка</th>
+                            <th>Комментарий</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <input type="hidden" name="class_id" value="{{ selected_class }}">
+                        <input type="hidden" name="subject_id" value="{{ selected_subject }}">
+                        <input type="hidden" name="quarter" value="{{ selected_quarter }}">
+
+                        {% for student in students_grades %}
+                        <tr>
+                            <td>
+                                {{ student.last_name }} {{ student.first_name }}
+                                {% if student.middle_name %}{{ student.middle_name }}{% endif %}
+                            </td>
+                            <td>
+                                <input type="hidden" name="student_id" value="{{ student.id }}">
+                                <select name="grade" class="form-select form-select-sm grade-select" style="width:80px;"
+                                        onchange="markChanged(this)">
+                                    <option value="">—</option>
+                                    {% for g in [2,3,4,5] %}
+                                    <option value="{{ g }}" {% if student.grade == g %}selected{% endif %}>
+                                        {{ g }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" class="form-control form-control-sm comment-input"
+                                       name="comment" value="{{ student.comment or '' }}" style="max-width:200px;"
+                                       onchange="markChanged(this)">
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary saved-badge" id="status-{{ student.id }}">Сохранено</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- Кнопка "Готово" внизу таблицы (дублирующая) -->
+            <div class="text-center p-3 border-top">
+                <button type="button" class="btn btn-success btn-lg" onclick="submitAllGrades()">
+                    <i class="bi bi-check2-all"></i> Готово (сохранить все оценки)
+                </button>
+                <span class="text-muted ms-3" id="changesCount">Изменений: 0</span>
+            </div>
+        </form>
+    </div>
+</div>
+{% elif selected_class and selected_subject and selected_quarter %}
+<div class="alert alert-info text-center">
+    <i class="bi bi-info-circle"></i> Нет данных для отображения
+</div>
+{% else %}
+<div class="alert alert-secondary text-center">
+    <i class="bi bi-funnel"></i> Выберите класс, предмет и четверть для просмотра оценок
+</div>
+{% endif %}
+
+<script>
+    // Счётчик изменений
+    let changesCount = 0;
+
+    function markChanged(element) {
+        const row = element.closest('tr');
+        const statusBadge = row.querySelector('.saved-badge');
+        if (statusBadge) {
+            statusBadge.textContent = '⚠️ Не сохранено';
+            statusBadge.className = 'badge bg-warning saved-badge';
+        }
+        changesCount++;
+        updateChangesCount();
+    }
+
+    function updateChangesCount() {
+        const countEl = document.getElementById('changesCount');
+        if (countEl) {
+            countEl.textContent = `Изменений: ${changesCount}`;
+        }
+    }
+
+    function submitAllGrades() {
+        const form = document.getElementById('gradesForm');
+        // Сохраняем все формы на странице
+        const rows = form.querySelectorAll('tbody tr');
+        let savedCount = 0;
+
+        rows.forEach(row => {
+            const select = row.querySelector('.grade-select');
+            const comment = row.querySelector('.comment-input');
+            const statusBadge = row.querySelector('.saved-badge');
+
+            // Если есть изменения или оценка выбрана
+            if (select && select.value) {
+                // Создаём скрытое поле для отправки
+                const studentId = row.querySelector('input[name="student_id"]').value;
+                const grade = select.value;
+                const commentText = comment ? comment.value : '';
+
+                // Отправляем через fetch (AJAX)
+                const formData = new FormData();
+                formData.append('student_id', studentId);
+                formData.append('subject_id', document.querySelector('input[name="subject_id"]').value);
+                formData.append('grade', grade);
+                formData.append('quarter', document.querySelector('input[name="quarter"]').value);
+                formData.append('comment', commentText);
+                formData.append('class_id', document.querySelector('input[name="class_id"]').value);
+
+                fetch("{{ url_for('add_grade') }}", {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(data => {
+                    if (statusBadge) {
+                        statusBadge.textContent = '✅ Сохранено';
+                        statusBadge.className = 'badge bg-success saved-badge';
+                    }
+                    savedCount++;
+                    if (savedCount === rows.length) {
+                        showNotification('Все оценки успешно сохранены!');
+                        changesCount = 0;
+                        updateChangesCount();
+                    }
+                })
+                .catch(error => {
+                    if (statusBadge) {
+                        statusBadge.textContent = '❌ Ошибка';
+                        statusBadge.className = 'badge bg-danger saved-badge';
+                    }
+                });
+            }
+        });
+    }
+
+    function showNotification(message) {
+        // Создаём уведомление
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-success alert-dismissible fade show';
+        alert.style.position = 'fixed';
+        alert.style.top = '80px';
+        alert.style.right = '20px';
+        alert.style.zIndex = '9999';
+        alert.innerHTML = `
+            <i class="bi bi-check-circle-fill"></i> ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alert);
+
+        setTimeout(() => {
+            alert.classList.remove('show');
+            setTimeout(() => alert.remove(), 300);
+        }, 3000);
+    }
+
+    // Сброс счётчика при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+        changesCount = 0;
+        updateChangesCount();
+    });
+</script>
+
+<style>
+    .saved-badge {
+        font-size: 12px;
+        padding: 4px 10px;
+        border-radius: 20px;
+    }
+    .grade-select {
+        transition: border-color 0.3s ease;
+    }
+    .grade-select:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+    .btn-success {
+        transition: all 0.3s ease;
+    }
+    .btn-success:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    }
+</style>
+{% endblock %}

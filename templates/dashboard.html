@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-grid-1x2-fill text-primary"></i> Главная панель</h2>
+    <span class="text-muted">{{ datetime.now().strftime('%d.%m.%Y %H:%M') if datetime else '' }}</span>
+</div>
+
+<!-- Статистика -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="icon"><i class="bi bi-people-fill"></i></div>
+            <div class="number">{{ students_count|default(0) }}</div>
+            <div class="label">Всего учащихся</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="icon"><i class="bi bi-person-video2"></i></div>
+            <div class="number">{{ teachers_count|default(0) }}</div>
+            <div class="label">Учителей</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="icon"><i class="bi bi-building"></i></div>
+            <div class="number">{{ classes_count|default(0) }}</div>
+            <div class="label">Классов</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="icon"><i class="bi bi-pencil-square"></i></div>
+            <div class="number">{{ grades_today|default(0) }}</div>
+            <div class="label">Оценок сегодня</div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Последние действия -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-clock-history"></i> Последние действия
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Пользователь</th>
+                                <th>Действие</th>
+                                <th>Объект</th>
+                                <th>Время</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for action in recent_actions|default([]) %}
+                            <tr>
+                                <td>{{ action[0] }}</td>
+                                <td>
+                                    <span class="badge bg-{% if action[1] == 'INSERT' %}success{% elif action[1] == 'UPDATE' %}warning{% elif action[1] == 'DELETE' %}danger{% else %}secondary{% endif %}">
+                                        {{ action[1] }}
+                                    </span>
+                                </td>
+                                <td>{{ action[3] }}</td>
+                                <!-- ИСПРАВЛЕНО: убрал .strftime() -->
+                                <td>{{ action[2] if action[2] else '' }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">Нет записей</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Быстрые действия -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-lightning-fill"></i> Быстрые действия
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('students') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-people-fill"></i> Список учащихся
+                    </a>
+                    <a href="{{ url_for('grades') }}" class="btn btn-outline-success">
+                        <i class="bi bi-book-fill"></i> Выставить оценки
+                    </a>
+                    <a href="{{ url_for('attendance') }}" class="btn btn-outline-info">
+                        <i class="bi bi-calendar-check-fill"></i> Отметить посещаемость
+                    </a>
+                    <a href="{{ url_for('reports') }}" class="btn btn-outline-warning">
+                        <i class="bi bi-file-text-fill"></i> Сформировать отчёт
+                    </a>
+                    {% if session.role == 'admin' %}
+                    <a href="{{ url_for('users') }}" class="btn btn-outline-danger">
+                        <i class="bi bi-person-gear"></i> Управление пользователями
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
