@@ -26,16 +26,16 @@
     </div>
     <div class="col-md-3">
         <div class="stat-card">
-            <div class="icon"><i class="bi bi-building"></i></div>
-            <div class="number">{{ classes_count|default(0) }}</div>
-            <div class="label">Классов</div>
+            <div class="icon"><i class="bi bi-person-badge"></i></div>
+            <div class="number">{{ class_teacher_count|default(0) }}</div>
+            <div class="label">Классные руководители</div>
         </div>
     </div>
     <div class="col-md-3">
         <div class="stat-card">
-            <div class="icon"><i class="bi bi-pencil-square"></i></div>
-            <div class="number">{{ grades_today|default(0) }}</div>
-            <div class="label">Оценок сегодня</div>
+            <div class="icon"><i class="bi bi-building"></i></div>
+            <div class="number">{{ classes_count|default(0) }}</div>
+            <div class="label">Классов</div>
         </div>
     </div>
 </div>
@@ -68,7 +68,6 @@
                                     </span>
                                 </td>
                                 <td>{{ action[3] }}</td>
-                                <!-- ИСПРАВЛЕНО: убрал .strftime() -->
                                 <td>{{ action[2] if action[2] else '' }}</td>
                             </tr>
                             {% else %}

@@ -34,10 +34,13 @@
             <div class="col-md-4">
                 <div class="stat-card">
                     <div class="number">
-                        {% set avg = report.students|map(attribute='average_grade')|select('is not none')|map('float')|sum / 
-                                   report.students|selectattr('average_grade', 'defined')|selectattr('average_grade', '!=', None)|list|length 
-                                   if report.students|selectattr('average_grade', 'defined')|selectattr('average_grade', '!=', None)|list|length > 0 else 0 %}
-                        {{ "%.1f"|format(avg) }}
+                        {% set students_with_grades = report.students|selectattr('average_grade', 'defined')|selectattr('average_grade', '!=', None)|list %}
+                        {% if students_with_grades|length > 0 %}
+                            {% set avg = students_with_grades|map(attribute='average_grade')|map('float')|sum / students_with_grades|length %}
+                            {{ "%.1f"|format(avg) }}
+                        {% else %}
+                            0.0
+                        {% endif %}
                     </div>
                     <div class="label">Средний балл по классу</div>
                 </div>
@@ -45,7 +48,7 @@
             <div class="col-md-4">
                 <div class="stat-card">
                     <div class="number">
-                        {% set excellent = report.students|selectattr('average_grade', '>', 4.5)|list|length %}
+                        {% set excellent = report.students|selectattr('average_grade', 'defined')|selectattr('average_grade', '!=', None)|selectattr('average_grade', '>', 4.5)|list|length %}
                         {{ excellent }}
                     </div>
                     <div class="label">Отличников</div>
