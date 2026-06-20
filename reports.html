@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Отчёты{% endblock %}
+
+{% block content %}
+<h2><i class="bi bi-file-text-fill text-warning"></i> Формирование отчётов</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-file-earmark-text"></i> Создать отчёт
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('generate_report') }}">
+                    <div class="mb-3">
+                        <label class="form-label">Тип отчёта</label>
+                        <select name="report_type" class="form-select" required>
+                            <option value="">Выберите тип</option>
+                            <option value="class_report">Отчёт по классу</option>
+                            <option value="student_report">Отчёт по учащемуся</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Класс</label>
+                        <select name="class_id" class="form-select" required>
+                            <option value="">Выберите класс</option>
+                            {% for cls in classes %}
+                            <option value="{{ cls.id }}">{{ cls.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Четверть</label>
+                        <select name="quarter" class="form-select" required>
+                            <option value="">Выберите четверть</option>
+                            {% for q in ['1', '2', '3', '4'] %}
+                            <option value="{{ q }}">Четверть {{ q }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-warning w-100">
+                        <i class="bi bi-file-pdf"></i> Сформировать отчёт
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-info-circle"></i> Информация
+            </div>
+            <div class="card-body">
+                <p>Отчёт по классу включает:</p>
+                <ul>
+                    <li>Список учащихся класса</li>
+                    <li>Средний балл по каждому предмету</li>
+                    <li>Общий средний балл по классу</li>
+                    <li>Количество отличников и хорошистов</li>
+                </ul>
+                <p class="text-muted small mt-3">
+                    <i class="bi bi-printer"></i> Отчёт можно распечатать или сохранить в PDF
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

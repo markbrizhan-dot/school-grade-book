@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Добавление учащегося{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-person-plus"></i> Добавление нового учащегося
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('add_student') }}">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Фамилия <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="last_name" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Имя <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="first_name" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Отчество</label>
+                            <input type="text" class="form-control" name="middle_name">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Дата рождения</label>
+                            <input type="date" class="form-control" name="birth_date">
+                        </div>
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label">Адрес</label>
+                            <input type="text" class="form-control" name="address">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Родитель</label>
+                            <input type="text" class="form-control" name="parent_name">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Телефон родителя</label>
+                            <input type="text" class="form-control" name="parent_phone">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Класс <span class="text-danger">*</span></label>
+                        <select class="form-select" name="class_id" required>
+                            <option value="">Выберите класс</option>
+                            {% for cls in classes %}
+                            <option value="{{ cls.id }}">{{ cls.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg"></i> Сохранить
+                        </button>
+                        <a href="{{ url_for('students') }}" class="btn btn-secondary">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

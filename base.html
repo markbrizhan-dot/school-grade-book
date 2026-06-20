@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Учёт успеваемости{% endblock %}</title>
+
+    <!-- ИКОНКА САЙТА (ваше фото Иконка.jpg) -->
+    <link rel="icon" href="/static/Иконка.jpg" type="image/jpeg">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            padding-top: 56px;
+            background-color: #f5f6fa;
+        }
+        .sidebar {
+            position: fixed;
+            top: 56px;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+            padding: 20px 0;
+            background: #2c3e50;
+            width: 250px;
+            overflow-y: auto;
+            color: white;
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,.75);
+            border-radius: 0;
+            padding: 10px 20px;
+        }
+        .sidebar .nav-link:hover {
+            color: white;
+            background: rgba(255,255,255,.1);
+        }
+        .sidebar .nav-link.active {
+            color: white;
+            background: #3498db;
+        }
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.05);
+        }
+        .card-header {
+            background: white;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+            padding: 15px 20px;
+            border-radius: 12px 12px 0 0 !important;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.05);
+            text-align: center;
+        }
+        .stat-card .number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .stat-card .label {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        .stat-card .icon {
+            font-size: 36px;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        .flash-messages {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 400px;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Навигационная панель -->
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('dashboard') }}">
+                <i class="bi bi-mortarboard-fill"></i> Учёт успеваемости
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if session.user_id %}
+                        <li class="nav-item">
+                            <span class="nav-link text-light">
+                                <i class="bi bi-person-circle"></i> {{ session.full_name }}
+                                <span class="badge bg-info ms-1">{{ session.role }}</span>
+                            </span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('profile') }}">
+                                <i class="bi bi-gear"></i> Профиль
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('logout') }}">
+                                <i class="bi bi-box-arrow-right"></i> Выход
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Боковая панель -->
+    {% if session.user_id %}
+    <div class="sidebar">
+        <div class="text-center mb-3">
+            <i class="bi bi-mortarboard-fill" style="font-size: 40px;"></i>
+            <h6 class="mt-1">{{ session.full_name }}</h6>
+            <small class="text-muted">{{ session.role }}</small>
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">
+                    <i class="bi bi-grid-1x2-fill"></i> Главная
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint in ['students', 'add_student', 'edit_student'] %}active{% endif %}" href="{{ url_for('students') }}">
+                    <i class="bi bi-people-fill"></i> Учащиеся
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'grades' %}active{% endif %}" href="{{ url_for('grades') }}">
+                    <i class="bi bi-book-fill"></i> Успеваемость
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'attendance' %}active{% endif %}" href="{{ url_for('attendance') }}">
+                    <i class="bi bi-calendar-check-fill"></i> Посещаемость
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'reports' %}active{% endif %}" href="{{ url_for('reports') }}">
+                    <i class="bi bi-file-text-fill"></i> Отчёты
+                </a>
+            </li>
+            {% if session.role == 'admin' %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'users' %}active{% endif %}" href="{{ url_for('users') }}">
+                    <i class="bi bi-person-gear"></i> Пользователи
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <!-- Основное содержимое -->
+    <div class="main-content">
+        <!-- Flash сообщения -->
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endwith %}
+        </div>
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Автоматическое скрытие flash-сообщений через 5 секунд
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                document.querySelectorAll('.alert').forEach(function(el) {
+                    var alert = new bootstrap.Alert(el);
+                    alert.close();
+                });
+            }, 5000);
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

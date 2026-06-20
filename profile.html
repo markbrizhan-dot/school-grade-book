@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Личный кабинет{% endblock %}
+
+{% block content %}
+<h2><i class="bi bi-person-circle text-primary"></i> Личный кабинет</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-info-circle"></i> Информация о пользователе
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Логин</dt>
+                    <dd class="col-sm-8">{{ user.username }}</dd>
+                    
+                    <dt class="col-sm-4">ФИО</dt>
+                    <dd class="col-sm-8">{{ user.full_name }}</dd>
+                    
+                    <dt class="col-sm-4">Роль</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge bg-primary">{{ roles.get(user.role, user.role) }}</span>
+                    </dd>
+                    
+                    <dt class="col-sm-4">Последний вход</dt>
+                    <!-- ИСПРАВЛЕНО: убрал .strftime() -->
+                    <dd class="col-sm-8">{{ user.last_login if user.last_login else 'Не входил' }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-key"></i> Смена пароля
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('change_password') }}">
+                    <div class="mb-3">
+                        <label class="form-label">Текущий пароль</label>
+                        <input type="password" class="form-control" name="old_password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Новый пароль</label>
+                        <input type="password" class="form-control" name="new_password" required>
+                        <small class="text-muted">Минимум 6 символов</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Подтверждение пароля</label>
+                        <input type="password" class="form-control" name="confirm_password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-check-lg"></i> Изменить пароль
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

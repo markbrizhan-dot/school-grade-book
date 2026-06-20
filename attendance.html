@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Посещаемость{% endblock %}
+
+{% block content %}
+<h2><i class="bi bi-calendar-check-fill text-info"></i> Посещаемость</h2>
+
+<!-- Фильтры -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Класс</label>
+                <select name="class_id" class="form-select">
+                    <option value="">Выберите класс</option>
+                    {% for cls in classes %}
+                    <option value="{{ cls.id }}" {% if selected_class == cls.id|string %}selected{% endif %}>
+                        {{ cls.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Предмет</label>
+                <select name="subject_id" class="form-select">
+                    <option value="">Выберите предмет</option>
+                    {% for subj in subjects %}
+                    <option value="{{ subj.id }}" {% if selected_subject == subj.id|string %}selected{% endif %}>
+                        {{ subj.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Дата</label>
+                <input type="date" class="form-control" name="date" value="{{ selected_date }}">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search"></i> Показать
+                </button>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <a href="{{ url_for('attendance') }}" class="btn btn-secondary w-100">Сбросить</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Таблица посещаемости -->
+{% if students_attendance %}
+<div class="card">
+    <div class="card-header">
+        <i class="bi bi-list-ul"></i> Посещаемость за {{ selected_date }}
+    </div>
+    <div class="card-body p-0">
+        <form method="POST" action="{{ url_for('mark_attendance') }}">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Учащийся</th>
+                            <th>Статус</th>
+                            <th>Причина</th>
+                            <th>Действие</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <input type="hidden" name="class_id" value="{{ selected_class }}">
+                        <input type="hidden" name="subject_id" value="{{ selected_subject }}">
+                        <input type="hidden" name="lesson_date" value="{{ selected_date }}">
+                        
+                        {% for student in students_attendance %}
+                        <tr>
+                            <td>
+                                {{ student.last_name }} {{ student.first_name }}
+                                {% if student.middle_name %}{{ student.middle_name }}{% endif %}
+                            </td>
+                            <td>
+                                <input type="hidden" name="student_id" value="{{ student.id }}">
+                                <select name="status" class="form-select form-select-sm" style="width:130px;">
+                                    <option value="">Не отмечено</option>
+                                    <option value="present" {% if student.status == 'present' %}selected{% endif %}>Присутствовал</option>
+                                    <option value="absent" {% if student.status == 'absent' %}selected{% endif %}>Отсутствовал</option>
+                                    <option value="late" {% if student.status == 'late' %}selected{% endif %}>Опоздал</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" class="form-control form-control-sm" 
+                                       name="reason" value="{{ student.reason or '' }}" style="max-width:200px;">
+                            </td>
+                            <td>
+                                <button type="submit" class="btn btn-sm btn-info">
+                                    <i class="bi bi-check-lg"></i>
+                                </button>
+                                {% if student.status %}
+                                <span class="badge bg-secondary">Сохранено</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+</div>
+{% elif selected_class and selected_subject %}
+<div class="alert alert-info text-center">
+    <i class="bi bi-info-circle"></i> Нет данных для отображения
+</div>
+{% else %}
+<div class="alert alert-secondary text-center">
+    <i class="bi bi-funnel"></i> Выберите класс, предмет и дату для просмотра посещаемости
+</div>
+{% endif %}
+{% endblock %}
